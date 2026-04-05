@@ -12,7 +12,6 @@ export const createExpense = async (req, res) => {
     }
 
     const expense = await Expense.create({
-      userId: req.user.id,
       amount,
       category,
       note,
@@ -32,7 +31,7 @@ export const getExpenses = async (req, res) => {
   try {
     const { category, startDate, endDate } = req.query;
 
-    const query = { userId: req.user.id };
+    const query = {};
 
     if (category && category !== "All") {
       query.category = category;
@@ -59,7 +58,7 @@ export const getExpenses = async (req, res) => {
 export const updateExpense = async (req, res) => {
   try {
     const expense = await Expense.findOneAndUpdate(
-      { _id: req.params.id, userId: req.user.id },
+      { _id: req.params.id },
       req.body,
       { new: true }
     );
@@ -81,7 +80,6 @@ export const deleteExpense = async (req, res) => {
   try {
     const expense = await Expense.findOneAndDelete({
       _id: req.params.id,
-      userId: req.user.id,
     });
 
     if (!expense) {
@@ -100,7 +98,6 @@ export const deleteExpense = async (req, res) => {
 export const getSummary = async (req, res) => {
   try {
     const result = await Expense.aggregate([
-      { $match: { userId: req.user.id } },
       {
         $group: {
           _id: null,
@@ -123,7 +120,6 @@ export const getSummary = async (req, res) => {
 export const getCategoryBreakdown = async (req, res) => {
   try {
     const data = await Expense.aggregate([
-      { $match: { userId: req.user.id } },
       {
         $group: {
           _id: "$category",
@@ -149,7 +145,6 @@ export const getCategoryBreakdown = async (req, res) => {
 export const getTrends = async (req, res) => {
   try {
     const data = await Expense.aggregate([
-      { $match: { userId: req.user.id } },
       {
         $group: {
           _id: {
